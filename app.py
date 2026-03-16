@@ -1,185 +1,302 @@
 import streamlit as st
 
-st.set_page_config(page_title="AI-советчик по Python", page_icon="💡", layout="centered")
-
-st.title("💡 AI-советчик по Python")
-st.write("Советчик помогает понять задачу, но не даёт готовое решение.")
-
-# База подсказок по модулям
-advice_data = {
-    "Ввод, обработка и вывод данных": {
-        "keywords": ["input", "print", "ввод", "вывод", "переменн", "данные"],
-        "level1": "Подумайте, какие данные программа должна получить от пользователя и что нужно вывести в результате.",
-        "level2": "1. Считайте данные с помощью input().\n2. При необходимости преобразуйте тип данных.\n3. Выполните нужную обработку.\n4. Выведите результат с помощью print().",
-        "level3": "Полезный синтаксис:\n- input()\n- int(input())\n- float(input())\n- print()"
-    },
-    "Условные конструкции": {
-        "keywords": ["if", "elif", "else", "услов", "ветвл", "сравн"],
-        "level1": "Подумайте, какое условие должна проверить программа и что должно произойти в каждом случае.",
-        "level2": "1. Определите условие.\n2. Используйте if для первой проверки.\n3. При необходимости добавьте elif или else.\n4. Для каждого варианта предусмотрите свой вывод.",
-        "level3": "Полезный синтаксис:\nif условие:\n    действие\nelif другое_условие:\n    действие\nelse:\n    действие"
-    },
-    "Цикл for": {
-        "keywords": ["for", "цикл", "range", "повтор", "несколько раз"],
-        "level1": "Подумайте, известно ли заранее количество повторений.",
-        "level2": "1. Определите, сколько раз нужно выполнить действие.\n2. Используйте цикл for.\n3. При необходимости примените range().\n4. Внутри цикла разместите повторяющееся действие.",
-        "level3": "Полезный синтаксис:\nfor i in range(n):\n    действие"
-    },
-    "Цикл while": {
-        "keywords": ["while", "пока", "условие продолжения"],
-        "level1": "Подумайте, какое условие должно оставаться истинным, чтобы цикл продолжался.",
-        "level2": "1. Задайте начальное значение.\n2. Проверьте условие в while.\n3. Выполните действия внутри цикла.\n4. Не забудьте изменять переменную, влияющую на условие.",
-        "level3": "Полезный синтаксис:\nwhile условие:\n    действие\n    изменение_переменной"
-    },
-    "Обработка строковых данных": {
-        "keywords": ["строк", "text", "split", "join", "lower", "upper", "символ", "слово"],
-        "level1": "Подумайте, нужно ли работать со всей строкой, отдельными словами или отдельными символами.",
-        "level2": "1. Получите строку.\n2. Определите нужную операцию: разбиение, поиск, изменение регистра.\n3. Выполните обработку.\n4. Выведите результат.",
-        "level3": "Полезный синтаксис:\n- text.split()\n- text.lower()\n- text.upper()\n- len(text)\n- text[0]"
-    },
-    "Одномерные списки": {
-        "keywords": ["спис", "list", "append", "элемент", "индекс"],
-        "level1": "Подумайте, нужно ли хранить несколько однотипных значений в одной структуре.",
-        "level2": "1. Создайте список.\n2. При необходимости добавьте элементы.\n3. Используйте индексы или цикл для обработки.\n4. Выведите нужный результат.",
-        "level3": "Полезный синтаксис:\n- a = []\n- a.append(x)\n- a[i]\n- len(a)\n- for x in a:"
-    },
-    "Двумерные списки": {
-        "keywords": ["двумер", "матриц", "таблиц", "строка", "столбец"],
-        "level1": "Подумайте, представлены ли данные в виде таблицы: строки и столбцы.",
-        "level2": "1. Создайте двумерный список.\n2. Обращайтесь к элементам по двум индексам.\n3. Используйте вложенные циклы.\n4. Обрабатывайте строки или столбцы по условию задачи.",
-        "level3": "Полезный синтаксис:\n- a[row][col]\n- for row in a:\n- for i in range(rows):\n    for j in range(cols):"
-    },
-    "Словари": {
-        "keywords": ["словар", "dict", "ключ", "значение"],
-        "level1": "Подумайте, удобно ли хранить данные в формате 'ключ — значение'.",
-        "level2": "1. Создайте словарь.\n2. Добавьте элементы по ключам.\n3. Получайте данные по ключу.\n4. При необходимости перебирайте словарь в цикле.",
-        "level3": "Полезный синтаксис:\n- d = {}\n- d['ключ'] = значение\n- d['ключ']\n- for key, value in d.items():"
-    },
-    "Кортежи": {
-        "keywords": ["кортеж", "tuple", "неизмен"],
-        "level1": "Подумайте, нужно ли сохранить несколько значений в неизменяемом виде.",
-        "level2": "1. Создайте кортеж.\n2. Обращайтесь к элементам по индексу.\n3. Помните, что изменять элементы нельзя.",
-        "level3": "Полезный синтаксис:\n- t = (1, 2, 3)\n- t[0]\n- len(t)"
-    },
-    "Функции": {
-        "keywords": ["функц", "def", "return", "аргумент", "параметр", "вызвать"],
-        "level1": "Подумайте, какую часть программы можно оформить как отдельное действие с именем.",
-        "level2": "1. Определите, что делает функция.\n2. Решите, нужны ли ей параметры.\n3. Опишите действия внутри функции.\n4. При необходимости верните результат через return.\n5. Вызовите функцию.",
-        "level3": "Полезный синтаксис:\ndef name(arg):\n    действие\n    return результат\n\nname(value)"
-    },
-    "Работа с файлами": {
-        "keywords": ["файл", "open", "read", "write", "txt", "запис", "считать"],
-        "level1": "Подумайте, нужно ли прочитать данные из файла или записать их в файл.",
-        "level2": "1. Откройте файл в нужном режиме.\n2. Выполните чтение или запись.\n3. Закройте файл или используйте with.\n4. Обработайте полученные данные.",
-        "level3": "Полезный синтаксис:\nwith open('file.txt', 'r', encoding='utf-8') as f:\n    data = f.read()\n\nwith open('file.txt', 'w', encoding='utf-8') as f:\n    f.write('text')"
-    }
-}
-
-# Универсальные ответы по типичным вопросам
-common_tips = {
-    "ошибка": "Проверьте: правильно ли написаны имена переменных, хватает ли отступов, закрыты ли скобки и соответствует ли тип данных выполняемой операции.",
-    "input": "Функция input() считывает данные как строку. Если нужно число, используйте int(input()) или float(input()).",
-    "print": "Функция print() выводит данные на экран. Можно выводить и текст, и переменные.",
-    "int": "int() преобразует строку в целое число.",
-    "float": "float() преобразует строку в число с дробной частью.",
-    "индекс": "Индексация в Python начинается с 0.",
-    "len": "Функция len() возвращает длину строки, списка, кортежа и других структур.",
-    "range": "range() часто используется в цикле for для задания количества повторений.",
-    "return": "return используется для возврата результата из функции.",
-    "append": "append() добавляет новый элемент в конец списка.",
-    "split": "split() разбивает строку на список слов.",
-    "lower": "lower() переводит строку в нижний регистр.",
-    "upper": "upper() переводит строку в верхний регистр."
-}
-
-# Интерфейс
-module = st.selectbox("Выберите модуль", list(advice_data.keys()))
-
-task_text = st.text_area(
-    "Введите условие задания",
-    height=180,
-    placeholder="Например: программа должна запросить имя и возраст пользователя, а затем вывести приветствие."
+st.set_page_config(
+    page_title="AI-советчик",
+    page_icon="💡",
+    layout="centered"
 )
 
-question = st.text_input("Введите ваш вопрос")
+# ---------- Стили ----------
+st.markdown("""
+<style>
+html, body, [class*="css"]  {
+    font-family: 'Segoe UI', sans-serif;
+}
 
-help_level = st.radio(
-    "Выберите уровень помощи",
-    ["1 уровень — наводящая мысль", "2 уровень — алгоритм", "3 уровень — синтаксис"],
-    index=0
+.stApp {
+    background: linear-gradient(180deg, #f4f7ff 0%, #eef2ff 100%);
+}
+
+.block-container {
+    max-width: 820px;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.hero-box {
+    background: linear-gradient(135deg, #6d5dfc 0%, #8b7cff 100%);
+    color: white;
+    padding: 28px 30px;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(93, 80, 255, 0.25);
+    margin-bottom: 22px;
+}
+
+.hero-title {
+    font-size: 34px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.hero-subtitle {
+    font-size: 16px;
+    opacity: 0.95;
+    line-height: 1.5;
+}
+
+.card {
+    background: white;
+    border-radius: 22px;
+    padding: 24px;
+    box-shadow: 0 8px 24px rgba(43, 55, 120, 0.08);
+    margin-bottom: 18px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2b2d42;
+    margin-bottom: 10px;
+}
+
+.helper-text {
+    color: #5f6475;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.examples-box {
+    background: #f7f8ff;
+    border: 1px solid #e4e8ff;
+    border-radius: 18px;
+    padding: 18px;
+    margin-top: 14px;
+}
+
+.example-chip {
+    display: inline-block;
+    background: white;
+    border: 1px solid #d9def8;
+    color: #4b4f67;
+    border-radius: 999px;
+    padding: 8px 12px;
+    margin: 6px 6px 0 0;
+    font-size: 14px;
+}
+
+.answer-box {
+    background: #eef4ff;
+    border-left: 6px solid #6d5dfc;
+    padding: 18px;
+    border-radius: 16px;
+    color: #23304d;
+    white-space: pre-line;
+    line-height: 1.6;
+    margin-top: 10px;
+}
+
+.footer-note {
+    text-align: center;
+    color: #6c7287;
+    font-size: 13px;
+    margin-top: 16px;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# ---------- Заголовок ----------
+st.markdown("""
+<div class="hero-box">
+    <div class="hero-title">💡 AI-советчик по Python</div>
+    <div class="hero-subtitle">
+        Задайте вопрос по заданию. Советчик подсказывает направление решения,
+        напоминает синтаксис и помогает разобраться в теме, но не пишет готовый код.
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# ---------- Логика ответов ----------
+def get_answer(q: str) -> str:
+    q = q.lower()
+
+    if "input" in q or "ввод" in q or "считать" in q:
+        return """💡 Подсказка
+
+Чтобы получить данные от пользователя, используется функция input().
+
+Подумайте:
+• сколько значений нужно считать
+• нужно ли преобразовать их в число
+• в какие переменные сохранить введённые данные"""
+
+    elif "print" in q or "вывод" in q or "вывести" in q:
+        return """💡 Подсказка
+
+Для вывода данных используется функция print().
+
+Проверьте:
+• что именно нужно вывести
+• нужно ли добавить поясняющий текст
+• как объединить текст и переменные"""
+
+    elif "if" in q or "услов" in q or "ветв" in q:
+        return """💡 Подсказка
+
+Условная конструкция нужна, когда программа должна выбрать одно из нескольких действий.
+
+Алгоритм:
+1. проверить условие
+2. если оно истинно — выполнить одно действие
+3. иначе — выполнить другое"""
+
+    elif "for" in q or ("цикл" in q and "while" not in q):
+        return """💡 Подсказка
+
+Цикл for используется, когда количество повторений известно заранее.
+
+Подумайте:
+• сколько раз нужно повторить действие
+• нужен ли range()
+• что должно происходить внутри цикла"""
+
+    elif "while" in q:
+        return """💡 Подсказка
+
+Цикл while выполняется до тех пор, пока условие истинно.
+
+Важно:
+• правильно задать условие
+• изменять переменную внутри цикла
+• следить, чтобы цикл не стал бесконечным"""
+
+    elif "строк" in q or "split" in q or "upper" in q or "lower" in q or "символ" in q or "слово" in q:
+        return """💡 Подсказка
+
+При работе со строками нужно понять, что именно требуется:
+• обработать всю строку
+• разбить её на слова
+• найти отдельные символы
+• изменить регистр"""
+
+    elif "спис" in q or "list" in q or "append" in q:
+        return """💡 Подсказка
+
+Список нужен для хранения нескольких значений.
+
+Проверьте:
+• как создаётся список
+• как добавить новый элемент
+• как обратиться к элементу по индексу
+• нужен ли цикл для обработки всех элементов"""
+
+    elif "двумер" in q or "матриц" in q or "таблиц" in q:
+        return """💡 Подсказка
+
+Двумерный список похож на таблицу: в нём есть строки и столбцы.
+
+Подумайте:
+• как обратиться к элементу по двум индексам
+• нужен ли вложенный цикл
+• что обрабатывается: строка, столбец или вся таблица"""
+
+    elif "словар" in q or "dict" in q or "ключ" in q:
+        return """💡 Подсказка
+
+Словарь хранит данные в формате «ключ — значение».
+
+Проверьте:
+• какой ключ нужен
+• какое значение ему соответствует
+• как получить значение по ключу"""
+
+    elif "кортеж" in q or "tuple" in q:
+        return """💡 Подсказка
+
+Кортеж похож на список, но его элементы нельзя изменять.
+
+Подумайте:
+• нужно ли просто сохранить набор значений
+• будете ли вы потом менять элементы"""
+
+    elif "функц" in q or "def" in q or "return" in q:
+        return """💡 Подсказка
+
+Функция помогает вынести отдельное действие в самостоятельный блок кода.
+
+Подумайте:
+• как назвать функцию
+• нужны ли ей параметры
+• должна ли она что-то возвращать через return"""
+
+    elif "файл" in q or "open" in q or "read" in q or "write" in q:
+        return """💡 Подсказка
+
+Для работы с файлами используется open().
+
+Сначала определите:
+• нужно ли читать файл или записывать в него
+• какой режим нужен: r, w или a
+• нужно ли работать с текстом построчно"""
+
+    elif "ошибк" in q:
+        return """💡 Подсказка
+
+Если в программе ошибка, проверьте:
+• правильно ли написаны имена переменных
+• не забыты ли двоеточия и скобки
+• верные ли отступы
+• подходит ли тип данных для операции"""
+
+    else:
+        return """🤖 Я не нашёл точного шаблонного ответа.
+
+Попробуйте задать вопрос точнее.
+
+Например:
+• как использовать input
+• как вывести переменную
+• как сделать цикл for
+• как объявить функцию
+• как открыть файл"""
+
+# ---------- Основная карточка ----------
+st.markdown('<div class="card">', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Введите вопрос</div>', unsafe_allow_html=True)
+st.markdown(
+    '<div class="helper-text">Например: "как использовать input", "как сделать цикл for", "как открыть файл"</div>',
+    unsafe_allow_html=True
 )
 
-def find_common_tip(user_question):
-    q = user_question.lower()
-    for key, tip in common_tips.items():
-        if key in q:
-            return tip
-    return None
+question = st.text_input(
+    label="Ваш вопрос",
+    label_visibility="collapsed",
+    placeholder="Напишите ваш вопрос здесь..."
+)
 
-def module_matches_question(module_name, user_question):
-    q = user_question.lower()
-    keywords = advice_data[module_name]["keywords"]
-    return any(word in q for word in keywords)
-
-if st.button("Получить подсказку"):
-    if not question.strip():
+if st.button("Получить подсказку", use_container_width=True):
+    if question.strip() == "":
         st.warning("Введите вопрос.")
     else:
-        result = None
-        q = question.lower()
+        answer = get_answer(question)
+        st.markdown(f'<div class="answer-box">{answer}</div>', unsafe_allow_html=True)
 
-        # Сначала ищем точную общую подсказку
-        common_tip = find_common_tip(q)
+st.markdown("""
+<div class="examples-box">
+    <div class="section-title" style="font-size:16px;">Примеры вопросов</div>
+    <span class="example-chip">Как использовать input()?</span>
+    <span class="example-chip">Как сделать условие if?</span>
+    <span class="example-chip">Как работает цикл for?</span>
+    <span class="example-chip">Как объявить функцию?</span>
+    <span class="example-chip">Как открыть файл?</span>
+    <span class="example-chip">Как добавить элемент в список?</span>
+</div>
+""", unsafe_allow_html=True)
 
-        if common_tip:
-            st.subheader("Подсказка")
-            st.info(common_tip)
+st.markdown('</div>', unsafe_allow_html=True)
 
-        # Затем показываем помощь по выбранному модулю
-        st.subheader("Совет по выбранному модулю")
-
-        if help_level == "1 уровень — наводящая мысль":
-            st.success(advice_data[module]["level1"])
-        elif help_level == "2 уровень — алгоритм":
-            st.success(advice_data[module]["level2"])
-        else:
-            st.success(advice_data[module]["level3"])
-
-        # Дополнительный анализ вопроса
-        matched_modules = []
-        for module_name in advice_data:
-            if module_matches_question(module_name, q):
-                matched_modules.append(module_name)
-
-        if matched_modules and module not in matched_modules:
-            st.subheader("Похоже, вопрос связан ещё и с другой темой")
-            st.write(", ".join(matched_modules))
-
-        # Анализ условия задания
-        if task_text.strip():
-            st.subheader("Что стоит проверить в условии")
-            task_lower = task_text.lower()
-
-            recommendations = []
-
-            if "запрос" in task_lower or "ввести" in task_lower or "считать" in task_lower:
-                recommendations.append("Определите, сколько входных данных нужно получить от пользователя.")
-            if "вывести" in task_lower or "отобраз" in task_lower:
-                recommendations.append("Обратите внимание на точный формат вывода.")
-            if "посчитать" in task_lower or "вычисл" in task_lower:
-                recommendations.append("Выделите формулу или арифметическое действие, которое нужно выполнить.")
-            if "если" in task_lower:
-                recommendations.append("Проверьте, есть ли в задаче условие выбора между несколькими действиями.")
-            if "несколько" in task_lower or "список" in task_lower:
-                recommendations.append("Подумайте, нужна ли структура данных для хранения нескольких значений.")
-            if "файл" in task_lower:
-                recommendations.append("Проверьте, нужно ли читать файл, записывать в него или делать и то и другое.")
-
-            if recommendations:
-                for rec in recommendations:
-                    st.write(f"- {rec}")
-            else:
-                st.write("- Сначала выделите входные данные, обработку и ожидаемый результат.")
-
-        st.subheader("Напоминание")
-        st.write("Советчик даёт направление решения, но итоговую программу нужно написать самостоятельно.")
+# ---------- Нижняя заметка ----------
+st.markdown("""
+<div class="footer-note">
+AI-советчик помогает понять направление решения. Итоговую программу студент пишет самостоятельно.
+</div>
+""", unsafe_allow_html=True)
